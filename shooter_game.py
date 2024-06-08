@@ -39,14 +39,13 @@ hits_sec=0
 hit=True
 black = (255, 0, 0)
 lazer_1 =False
-lazer_2=False
 lazer_t1=0
 lazer_t2=0
 lazer_cx=0
 lazer_cy=0
 lazer_cx2=0
 lazer_cy2=0
-
+num=0
 
 # monster = GameSprite(img_enemy, 100, 100, 80, 50, 0)
 # monsters.add(monster)
@@ -73,21 +72,22 @@ class Player(GameSprite):
             self.rect.x -= self.speed_x
         if keys[K_d] and self.rect.x < win_width - 30:
             self.rect.x += self.speed_x
-        if keys[K_w] and self.rect.y > 0:
+        if keys[K_w] and self.rect.y > 100:
             self.rect.y -= self.speed_y
         if keys[K_s] and self.rect.y < win_height - 30:
             self.rect.y += self.speed_y
         lazer_cx=self.rect.centerx
         lazer_cy=self.rect.centery
     def fire(self):
-        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1
+        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,num
+        num=0
         lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
         lazer1.add(lazers_2)
         lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
         lazer2.add(lazers_2)
-        lazer_1=True
         lazer_cx2=lazer_cx
         lazer_cy2=lazer_cy
+        lazer_1=True
 
 
     # def fire(self):
@@ -95,31 +95,40 @@ class Player(GameSprite):
     #     bullets.add(bullet)
 
 class Lazer(GameSprite):
-    direction ="LEFT"
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y)
-    def update(self):
-        global lazer_t1,lazer_t2,lazer_1,lazer_2,lazer3,lazer4
-        text_life = font1.render(str(lazer_t2), 1, (0, 150, 0))
-        window.blit(text_life, (650, 110))  
-        if lazer_1:
-            lazer_t1 +=1
-            if lazer_t1==20:
-                lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,80,0)
-                lazer3.add(lazers_1)
-                lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,80,0)
-                lazer4.add(lazers_1)
-                lazer_1=False
-                lazer_2=True
-                lazer2.kill()
-                lazer1.kill()
-                lazer_t1=0
-        # if lazer_2:
-        #     lazer_t2 +=1
-        #     if lazer_t2==20:
-        #         lazer3.kill()
-        #         lazer4.kill()
-        #         lazer_2=False
+    def spawn(self):
+        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,lazer_t1
+        lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
+        lazer1.add(lazers_2)
+        lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
+        lazer2.add(lazers_2)
+        lazer_cx2=lazer_cx
+        lazer_cy2=lazer_cy
+        lazer_1=True
+        lazer_t1=0
+
+
+
+
+    # def update(self):
+    #     global lazer_t1,lazer_t2,lazer_1,lazer3,lazer4
+    #     if lazer_1:
+    #         lazer_t1 +=1
+    #         if lazer_t1==40:
+    #             lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,80,0)
+    #             lazer3.add(lazers_1)
+    #             lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,80,0)
+    #             lazer4.add(lazers_1)
+    #             lazer1.kill()
+    #             lazer2.kill()
+    #         elif lazer_t1==80:
+    #             lazer3.kill()
+    #             lazer4.kill()
+    #             lazer_t1=0
+    #             lazer_1=False
+                
+            
 
 
 
@@ -152,6 +161,7 @@ class SuperUfo(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed,sprite_speed_y, max_hits):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed,sprite_speed_y)
         self.max_hits = max_hits
+        self.isVictible = True
     def update(self):
         if self.direction =="LEFT" and self.rect.x>=0:
             self.rect.x -=2
@@ -162,9 +172,10 @@ class SuperUfo(GameSprite):
         elif self.direction=="RIGHT" and self.rect.x>=470:
             self.direction="LEFT"
         text_a = font1.render(str(hits), 1, (0, 150, 0))
-        window.blit(text_a, (self.rect.centerx, 50))    
+        window.blit(text_a, (344, 465))    
     def gotHit(self):
-        self.max_hits -= 1
+        if self.isVictible:
+            self.max_hits -= 1
     def isKilled(self):
         if(self.max_hits <= 0):
             self.kill()
@@ -235,7 +246,6 @@ while run:
         bullets.update()
         asteroids.update()
         superMonsters.update()
-        lazers_2.update()
 
 
         player.reset()
@@ -269,14 +279,30 @@ while run:
         
         if hit and hits==0:
             hits_sec+=1
-
+        
+        if lazer_1:
+            lazer_t1 +=1
+            if lazer_t1==10:
+                lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,80,0)
+                lazer3.add(lazers_1)
+                lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,80,0)
+                lazer4.add(lazers_1)
+                lazer1.kill()
+                lazer2.kill()
+            elif lazer_t1==15:
+                lazer3.kill()
+                lazer4.kill()
+                lazer_1=False 
+                num+=1
+                if num!=5:    
+                    lazer1.spawn()
 
         #програш
         if life == 0:
             finish = True 
             window.blit(lose, (200, 200))
         
-        text_life = font1.render(str(life), 1, (0, 150, 0))
+        text_life = font1.render(str(num), 1, (0, 150, 0))
         window.blit(text_life, (650, 10))
 
         display.update()
