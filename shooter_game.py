@@ -5,8 +5,6 @@ from random import randint
 from time import time as timer #імпортуємо функцію для засікання часу, щоб інтерпретатор не шукав цю функцію в pygame модулі time, даємо їй іншу назву самі
 
 mixer.init()
-mixer.music.load('space.ogg')
-mixer.music.play()
 fire_sound = mixer.Sound('fire.ogg')
 
 font.init()
@@ -46,7 +44,9 @@ lazer_cy=0
 lazer_cx2=0
 lazer_cy2=0
 num=0
-
+rand=0
+start=False
+start2=0
 # monster = GameSprite(img_enemy, 100, 100, 80, 50, 0)
 # monsters.add(monster)
 
@@ -107,26 +107,6 @@ class Lazer(GameSprite):
         lazer_cy2=lazer_cy
         lazer_1=True
         lazer_t1=0
-
-
-
-
-    # def update(self):
-    #     global lazer_t1,lazer_t2,lazer_1,lazer3,lazer4
-    #     if lazer_1:
-    #         lazer_t1 +=1
-    #         if lazer_t1==40:
-    #             lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,80,0)
-    #             lazer3.add(lazers_1)
-    #             lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,80,0)
-    #             lazer4.add(lazers_1)
-    #             lazer1.kill()
-    #             lazer2.kill()
-    #         elif lazer_t1==80:
-    #             lazer3.kill()
-    #             lazer4.kill()
-    #             lazer_t1=0
-    #             lazer_1=False
                 
             
 
@@ -135,7 +115,7 @@ class Lazer(GameSprite):
 
 class Asteroid(GameSprite):
     def update(self):
-        global asteroid_x,ast,ast_2,mega_ufo
+        global asteroid_x,ast,ast_2,mega_ufo,start2
         self.rect.y += self.speed_x
         if self.rect.y > win_height:
             if ast_2 <= 116:  
@@ -154,6 +134,7 @@ class Asteroid(GameSprite):
         if ast_2==162 and mega_ufo:
             superMonster = SuperUfo(img_mega_ufo, 235, 0, 250, 100, 0,0,hits)
             superMonsters.add(superMonster)
+            start2=1
             mega_ufo=False
         
 class SuperUfo(GameSprite):
@@ -161,7 +142,6 @@ class SuperUfo(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed,sprite_speed_y, max_hits):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed,sprite_speed_y)
         self.max_hits = max_hits
-        self.isVictible = True
     def update(self):
         if self.direction =="LEFT" and self.rect.x>=0:
             self.rect.x -=2
@@ -236,7 +216,7 @@ while run:
         elif e.type == KEYDOWN and not finish:
             if e.key == K_SPACE:
                 fire_sound.play()
-                player.fire()
+                # player.fire()
 
 
     if not finish:
@@ -267,8 +247,6 @@ while run:
             life = life - 1
 
 
-
-
         # якщо спрайт торкнувся ворога зменшує життя
         if sprite.spritecollide(player, asteroids, False):
             life = life - 1
@@ -280,6 +258,26 @@ while run:
         if hit and hits==0:
             hits_sec+=1
         
+        if start2>=1:
+            start2+=1
+            if start2>=40:
+                start2=0
+                start=True
+                rand=randint(1,1)
+
+
+        if start and rand==1:    
+            lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
+            lazer1.add(lazers_2)
+            lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
+            lazer2.add(lazers_2)
+            lazer_cx2=lazer_cx
+            lazer_cy2=lazer_cy
+            lazer_1=True
+            start=False       
+        
+        
+        #перша атака
         if lazer_1:
             lazer_t1 +=1
             if lazer_t1==10:
@@ -296,13 +294,18 @@ while run:
                 num+=1
                 if num!=5:    
                     lazer1.spawn()
+                else:
+                    lazer_t1=0
+                    start=False
+                    num=0
+                    start2=1
 
         #програш
         if life == 0:
             finish = True 
             window.blit(lose, (200, 200))
         
-        text_life = font1.render(str(num), 1, (0, 150, 0))
+        text_life = font1.render(str(life), 1, (0, 150, 0))
         window.blit(text_life, (650, 10))
 
         display.update()
