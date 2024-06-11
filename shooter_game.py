@@ -32,7 +32,7 @@ asteroid_y=0
 ast = True
 ast_2=0
 mega_ufo=True
-hits =10
+hits =100
 hits_sec=0
 hit=True
 black = (255, 0, 0)
@@ -79,20 +79,8 @@ class Player(GameSprite):
         lazer_cx=self.rect.centerx
         lazer_cy=self.rect.centery
     def fire(self):
-        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,num
-        num=0
-        lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
-        lazer1.add(lazers_2)
-        lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
-        lazer2.add(lazers_2)
-        lazer_cx2=lazer_cx
-        lazer_cy2=lazer_cy
-        lazer_1=True
-
-
-    # def fire(self):
-    #     bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
-    #     bullets.add(bullet)
+        bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
+        bullets.add(bullet)
 
 class Lazer(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y):
@@ -154,8 +142,8 @@ class SuperUfo(GameSprite):
         text_a = font1.render(str(hits), 1, (0, 150, 0))
         window.blit(text_a, (344, 465))    
     def gotHit(self):
-        if self.isVictible:
-            self.max_hits -= 1
+        # if self.isVictible:
+        self.max_hits -= 1
     def isKilled(self):
         if(self.max_hits <= 0):
             self.kill()
@@ -216,7 +204,7 @@ while run:
         elif e.type == KEYDOWN and not finish:
             if e.key == K_SPACE:
                 fire_sound.play()
-                # player.fire()
+                player.fire()
 
 
     if not finish:
