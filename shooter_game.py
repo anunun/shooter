@@ -26,7 +26,7 @@ score = 0
 lost = 0
 goal = 1
 max_lost = 3
-life = 100
+life = 1
 asteroid_x=40
 asteroid_y=0
 ast = True
@@ -34,7 +34,6 @@ ast_2=0
 mega_ufo=True
 hits =100
 hits_sec=0
-hit=True
 black = (255, 0, 0)
 lazer_1 =False
 lazer_t1=0
@@ -47,8 +46,9 @@ num=0
 rand=0
 start=False
 start2=0
-# monster = GameSprite(img_enemy, 100, 100, 80, 50, 0)
-# monsters.add(monster)
+isVictible=False
+hit=0
+start3=False
 
 
 class GameSprite(sprite.Sprite):
@@ -63,7 +63,8 @@ class GameSprite(sprite.Sprite):
 
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
-
+    def rotate(self):
+        self.image = transform.rotate(self.image, 90)
 class Player(GameSprite):
     def update(self):
         global lazer_cx,lazer_cy
@@ -86,7 +87,13 @@ class Lazer(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y)
     def spawn(self):
-        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,lazer_t1
+        global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,lazer_t1#,monster1,monster2
+        # monster1 = GameSprite(img_enemy, lazer_cx -40, lazer_cy -200, 80, 50, 0,0)
+        # monsters.add(monster1)
+        # monster2 = GameSprite(img_enemy, lazer_cx -201, lazer_cy -35, 80, 50, 0,0)
+        # monsters.add(monster2)
+        # monster2.rotate()
+        
         lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
         lazer1.add(lazers_2)
         lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
@@ -142,8 +149,10 @@ class SuperUfo(GameSprite):
         text_a = font1.render(str(hits), 1, (0, 150, 0))
         window.blit(text_a, (344, 465))    
     def gotHit(self):
-        # if self.isVictible:
-        self.max_hits -= 1
+        global hits
+        if isVictible:
+            self.max_hits -= 20
+            hits-=20
     def isKilled(self):
         if(self.max_hits <= 0):
             self.kill()
@@ -179,7 +188,7 @@ lazers_2 = sprite.Group()
 
 for i in range(5):
     for i in range(9):
-        asteroid = Asteroid(img_non_killable_enemy, asteroid_x , asteroid_y, 40, 25,80,0)
+        asteroid = Asteroid(img_non_killable_enemy, asteroid_x , asteroid_y, 40, 25,5,0)
         asteroids.add(asteroid)
         asteroid_x+=80
     if ast:
@@ -210,11 +219,9 @@ while run:
     if not finish:
         window.blit(background, (0, 0))
         player.update()
-        monsters.update()
         bullets.update()
         asteroids.update()
         superMonsters.update()
-
 
         player.reset()
         monsters.draw(window)
@@ -228,7 +235,6 @@ while run:
         for superMonster in superMonsters:
             if sprite.spritecollide(superMonster, bullets, True):
                 superMonster.gotHit()
-                hits-=1
                 superMonster.isKilled()
 
         if sprite.spritecollide(player,lazers_1,False):
@@ -243,18 +249,35 @@ while run:
             finish = True
             window.blit(win, (200, 200))
         
-        if hit and hits==0:
+        if hits==0:
             hits_sec+=1
         
         if start2>=1:
-            start2+=1
-            if start2>=40:
-                start2=0
-                start=True
-                rand=randint(1,1)
+            if hit==0 and hits==100: 
+                start3=True
+                isVictible=False
+            elif hit==1 and hits ==80:
+                start3=True
+                isVictible=False
+            elif hit==2 and hits ==60:
+                start3=True
+                isVictible=False
+            elif hit==3 and hits ==40:
+                start3=True
+                isVictible=False
+            elif hit==4 and hits ==20:
+                start3=True
+                isVictible=False
 
-
-        if start and rand==1:    
+            if start3:
+                start2+=1
+                if start2>=40:
+                    start2=0
+                    start=True
+                    rand=randint(1,1)
+                    start3=False
+        #перша атака
+        if start and rand==1:
             lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
             lazer1.add(lazers_2)
             lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
@@ -262,10 +285,9 @@ while run:
             lazer_cx2=lazer_cx
             lazer_cy2=lazer_cy
             lazer_1=True
-            start=False       
+            start=False
+            isVictible=False
         
-        
-        #перша атака
         if lazer_1:
             lazer_t1 +=1
             if lazer_t1==10:
@@ -287,6 +309,8 @@ while run:
                     start=False
                     num=0
                     start2=1
+                    isVictible=True
+                    hit+=1
 
         #програш
         if life == 0:
