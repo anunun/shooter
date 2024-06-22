@@ -26,7 +26,7 @@ score = 0
 lost = 0
 goal = 1
 max_lost = 3
-life = 1
+life = 100
 asteroid_x=40
 asteroid_y=0
 ast = True
@@ -79,21 +79,18 @@ class Player(GameSprite):
             self.rect.y += self.speed_y
         lazer_cx=self.rect.centerx
         lazer_cy=self.rect.centery
-    def fire(self):
-        bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
-        bullets.add(bullet)
+    def fire():
+        
+
+    # def fire(self):
+    #     bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
+    #     bullets.add(bullet)
 
 class Lazer(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y)
     def spawn(self):
         global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,lazer_t1#,monster1,monster2
-        # monster1 = GameSprite(img_enemy, lazer_cx -40, lazer_cy -200, 80, 50, 0,0)
-        # monsters.add(monster1)
-        # monster2 = GameSprite(img_enemy, lazer_cx -201, lazer_cy -35, 80, 50, 0,0)
-        # monsters.add(monster2)
-        # monster2.rotate()
-        
         lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
         lazer1.add(lazers_2)
         lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
@@ -129,7 +126,7 @@ class Asteroid(GameSprite):
         if ast_2==162 and mega_ufo:
             superMonster = SuperUfo(img_mega_ufo, 235, 0, 250, 100, 0,0,hits)
             superMonsters.add(superMonster)
-            start2=1
+            start2=0
             mega_ufo=False
         
 class SuperUfo(GameSprite):
@@ -188,7 +185,7 @@ lazers_2 = sprite.Group()
 
 for i in range(5):
     for i in range(9):
-        asteroid = Asteroid(img_non_killable_enemy, asteroid_x , asteroid_y, 40, 25,5,0)
+        asteroid = Asteroid(img_non_killable_enemy, asteroid_x , asteroid_y, 40, 25,80,0)
         asteroids.add(asteroid)
         asteroid_x+=80
     if ast:
