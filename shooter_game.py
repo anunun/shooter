@@ -3,7 +3,7 @@ from typing import Any
 from pygame import *
 from random import randint
 from time import time as timer #імпортуємо функцію для засікання часу, щоб інтерпретатор не шукав цю функцію в pygame модулі time, даємо їй іншу назву самі
-
+#https://www.canva.com/design/DAGI3qy0xxs/eQQi1GH2IQhI7uMORBG2UA/edit
 mixer.init()
 fire_sound = mixer.Sound('fire.ogg')
 
@@ -49,7 +49,9 @@ start2=0
 isVictible=False
 hit=0
 start3=False
-
+lazer_y3=6
+lazer_y4=0
+num_l=0
 
 class GameSprite(sprite.Sprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, sixe_y , sprite_speed_x ,sprite_speed_y):
@@ -79,28 +81,29 @@ class Player(GameSprite):
             self.rect.y += self.speed_y
         lazer_cx=self.rect.centerx
         lazer_cy=self.rect.centery
-    def fire():
-        
-
-    # def fire(self):
-    #     bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
-    #     bullets.add(bullet)
+    def fire(self):
+        bullet = Bullet("bullet.png", self.rect.centerx - 7, self.rect.top, 15, 20, -15,0)
+        bullets.add(bullet)
 
 class Lazer(GameSprite):
     def __init__(self, sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y):
         super().__init__(sprite_img, sprite_x, sprite_y, size_x, size_y, sprite_speed, sprite_speed_y)
     def spawn(self):
         global lazer_1,lazer_cx2,lazer_cy2,lazer2,lazer1,lazer_t1#,monster1,monster2
-        lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
+        lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,0,0)
         lazer1.add(lazers_2)
-        lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
+        lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,0,0)
         lazer2.add(lazers_2)
         lazer_cx2=lazer_cx
         lazer_cy2=lazer_cy
         lazer_1=True
         lazer_t1=0
-                
-            
+    def update(self):
+        global num_l,Lazer_y1
+        self.rect.y += self.speed_y
+        if self.rect.y > win_height:
+            num_l+=1
+        for Lazer_y1 in lazer_y1:
 
 
 
@@ -126,7 +129,7 @@ class Asteroid(GameSprite):
         if ast_2==162 and mega_ufo:
             superMonster = SuperUfo(img_mega_ufo, 235, 0, 250, 100, 0,0,hits)
             superMonsters.add(superMonster)
-            start2=0
+            start2=1
             mega_ufo=False
         
 class SuperUfo(GameSprite):
@@ -182,6 +185,8 @@ asteroids = sprite.Group()
 superMonsters = sprite.Group()
 lazers_1 = sprite.Group()
 lazers_2 = sprite.Group()
+lazer_y1=sprite.Group()
+lazer_y2=sprite.Group()
 
 for i in range(5):
     for i in range(9):
@@ -219,6 +224,10 @@ while run:
         bullets.update()
         asteroids.update()
         superMonsters.update()
+        lazer_y1.update()
+        lazer_y2.update()
+
+
 
         player.reset()
         monsters.draw(window)
@@ -227,6 +236,8 @@ while run:
         superMonsters.draw(window)
         lazers_1.draw(window)
         lazers_2.draw(window)
+        lazer_y1.draw(window)
+        lazer_y2.draw(window)
 
         
         for superMonster in superMonsters:
@@ -237,7 +248,8 @@ while run:
         if sprite.spritecollide(player,lazers_1,False):
             life = life - 1
 
-
+        if sprite.spritecollide(player,lazer_y2,False) or sprite.spritecollide(player,lazer_y1,False):
+            life = life - 1
         # якщо спрайт торкнувся ворога зменшує життя
         if sprite.spritecollide(player, asteroids, False):
             life = life - 1
@@ -271,13 +283,13 @@ while run:
                 if start2>=40:
                     start2=0
                     start=True
-                    rand=randint(1,1)
+                    rand=randint(2,2)
                     start3=False
         #перша атака
         if start and rand==1:
-            lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,80,0)
+            lazer1 = Lazer("lazer_2.png", lazer_cx -3, lazer_cy -150, 6, 300,0,0)
             lazer1.add(lazers_2)
-            lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,80,0)
+            lazer2 = Lazer("lazer_2.png", lazer_cx -150, lazer_cy+2 , 300, 6,0,0)
             lazer2.add(lazers_2)
             lazer_cx2=lazer_cx
             lazer_cy2=lazer_cy
@@ -288,9 +300,9 @@ while run:
         if lazer_1:
             lazer_t1 +=1
             if lazer_t1==10:
-                lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,80,0)
+                lazer3 = Lazer("lazer_1.png", lazer_cx2 -3, lazer_cy2 -150, 6, 300,0,0)
                 lazer3.add(lazers_1)
-                lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,80,0)
+                lazer4 = Lazer("lazer_1.png", lazer_cx2 -150, lazer_cy2+2 , 300, 6,0,0)
                 lazer4.add(lazers_1)
                 lazer1.kill()
                 lazer2.kill()
@@ -308,13 +320,25 @@ while run:
                     start2=1
                     isVictible=True
                     hit+=1
+        #друга атака
+        elif start and rand==2:    
+            for i in range(10):
+                Lazer_y1 = Lazer("lazer_1.png",  0, 0-lazer_y3, win_width/2, 6,0,4)
+                lazer_y1.add(Lazer_y1)
+                Lazer_y2 = Lazer("lazer_1.png",  win_width/2,win_height-lazer_y4, win_width/2, 6,0,-4)
+                lazer_y2.add(Lazer_y2)
+                lazer_y3+=100
+                lazer_y4-=100
+            lazer_y3=6
+            lazer_y4=0
+            start=False
 
         #програш
         if life == 0:
             finish = True 
             window.blit(lose, (200, 200))
         
-        text_life = font1.render(str(life), 1, (0, 150, 0))
+        text_life = font1.render(str(num_l), 1, (0, 150, 0))
         window.blit(text_life, (650, 10))
 
         display.update()
